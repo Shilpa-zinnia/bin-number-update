@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Fix unusual values - Bin Number Updater{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header-with-logo">
+        <h1>Correct the flagged rows</h1>
+        <img src="{{ url_for('static', filename='img/zinnia-logo.png') }}" alt="Zinnia" class="card-logo" onerror="this.style.display='none'">
+    </div>
+    <p class="subtitle">Enter a corrected value for Contract Number and/or Bin Number below. Leave a field blank to keep the original value from the file.</p>
+
+    <form action="{{ url_for('apply_fixes') }}" method="post">
+        <input type="hidden" name="preview_id" value="{{ preview_id }}">
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Row</th>
+                        <th>Original Contract #</th>
+                        <th>Corrected Contract #</th>
+                        <th>Original Bin #</th>
+                        <th>Corrected Bin #</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for f in flagged %}
+                    <tr>
+                        <td>{{ f.index + 1 }}</td>
+                        <td>{{ f.contract_num }}</td>
+                        <td><input type="text" name="contract_{{ f.index }}" placeholder="{{ f.contract_num }}"></td>
+                        <td>{{ f.bin_num }}</td>
+                        <td><input type="text" name="bin_{{ f.index }}" placeholder="{{ f.bin_num }}"></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="form-actions">
+            <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancel and upload again</a>
+            <button type="submit" class="btn btn-primary">Apply fixes and continue</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

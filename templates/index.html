@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Bin Number Updater{% endblock %}
+
+{% block content %}
+<div class="alert alert-warning">
+    ⚠ Upload an Excel file with exactly two columns — Contract Number and Bin Number.
+</div>
+
+<div class="card upload-card">
+    <div class="card-header-with-logo">
+        <h1>Bulk update bin numbers</h1>
+        <img src="{{ url_for('static', filename='img/zinnia-logo.png') }}" alt="Zinnia" class="card-logo" onerror="this.style.display='none'">
+    </div>
+    <p class="subtitle">Upload an Excel file (.xlsx or .xls) containing contract numbers and bin numbers.</p>
+
+    <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data" id="uploadForm">
+        <div class="upload-zone" id="dropZone">
+            <div class="upload-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="17 8 12 3 7 8"/>
+                    <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+            </div>
+            <p class="upload-text">Drag & drop your Excel file here</p>
+            <p class="upload-hint">or click to browse (.xlsx, .xls)</p>
+            <input type="file" name="file" id="fileInput" accept=".xlsx,.xls" required hidden>
+            <span id="fileName" class="file-name"></span>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary" id="uploadBtn" disabled>
+                Upload & validate
+            </button>
+        </div>
+    </form>
+</div>
+
+<div class="card info-card">
+    <h2>Excel file requirements</h2>
+    <ul class="requirements-list">
+        <li>Two columns: Contract Number and Bin Number</li>
+        <li>First row should contain column headers</li>
+        <li>Supported formats: .xlsx, .xls</li>
+    </ul>
+</div>
+
+<script>
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+const fileName = document.getElementById('fileName');
+const uploadBtn = document.getElementById('uploadBtn');
+
+dropZone.addEventListener('click', () => fileInput.click());
+
+dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('drag-over');
+});
+
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+
+dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('drag-over');
+    if (e.dataTransfer.files.length) {
+        fileInput.files = e.dataTransfer.files;
+        showFile(e.dataTransfer.files[0]);
+    }
+});
+
+fileInput.addEventListener('change', () => {
+    if (fileInput.files.length) showFile(fileInput.files[0]);
+});
+
+function showFile(file) {
+    fileName.textContent = file.name;
+    uploadBtn.disabled = false;
+}
+</script>
+{% endblock %}

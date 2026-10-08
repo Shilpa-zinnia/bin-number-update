@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Bin Number Updater{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="{{ url_for('index') }}" class="brand">
+            <img src="{{ url_for('static', filename='img/zinnia-logo.png') }}" alt="Zinnia" class="logo" onerror="this.style.display='none'">
+            <span>Bin Number Updater</span>
+        </a>
+        <div class="nav-links">
+            {% if session.get('logged_in') %}
+            <a href="{{ url_for('audit_log') }}" class="nav-link">Audit Log</a>
+            <span class="nav-user">{{ session.get('user_display', '') }}</span>
+            <a href="{{ url_for('logout') }}" class="nav-link">Logout</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <main class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <img src="{{ url_for('static', filename='img/zinnia-logo.png') }}" alt="Zinnia" class="footer-logo" onerror="this.style.display='none'">
+        <p>Zinnia Bin Number Bulk Updater</p>
+    </footer>
+</body>
+</html>

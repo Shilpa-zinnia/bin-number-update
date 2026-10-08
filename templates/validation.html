@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Validation - Bin Number Updater{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header-with-logo">
+        <h1>Validation Summary</h1>
+        <img src="{{ url_for('static', filename='img/zinnia-logo.png') }}" alt="Zinnia" class="card-logo" onerror="this.style.display='none'">
+    </div>
+    <p class="subtitle">
+        Review the lists below. Only valid rows (contract found in Lifecad, no duplicate) will be updated when you proceed.
+    </p>
+
+    <div class="validation-section">
+        <h2>Total rows in file</h2>
+        <p class="stat-value">{{ total_rows }}</p>
+        <p class="form-hint">Rows with both a contract number and a bin number.</p>
+    </div>
+
+    <div class="validation-section">
+        <h2>Contract numbers not in T_LIPO_POLICY</h2>
+        {% if missing_contracts %}
+            {% if missing_contracts|length > 5 %}
+            <p class="form-hint">{{ missing_contracts|length }} contract numbers were not found in Lifecad and will be skipped on update. Download the full list below.</p>
+            <a href="{{ url_for('download_missing', preview_id=preview_id) }}" class="btn btn-secondary">Download missing contracts (Excel)</a>
+            {% else %}
+            <p class="form-hint">These contract numbers were not found in Lifecad. They will be skipped on update.</p>
+            <ul class="missing-list">
+                {% for c in missing_contracts %}
+                <li>{{ c }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        {% else %}
+        <p class="form-hint">None. All contract numbers were found in the database.</p>
+        {% endif %}
+    </div>
+
+    <div class="validation-section">
+        <h2>Duplicate contract numbers in file</h2>
+        {% if duplicate_contracts %}
+        <p class="form-hint">These contract numbers appear more than once in your file and will be skipped entirely — fix the file and re-upload if they should be included.</p>
+        <ul class="missing-list duplicate-list">
+            {% for c in duplicate_contracts %}
+            <li>{{ c }}</li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="form-hint">None. No duplicate contract numbers in the file.</p>
+        {% endif %}
+    </div>
+
+    <form action="{{ url_for('confirm') }}" method="post">
+        <input type="hidden" name="preview_id" value="{{ preview_id }}">
+        <div class="form-actions">
+            <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancel and upload again</a>
+            <button type="submit" class="btn btn-primary">Proceed with valid rows</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

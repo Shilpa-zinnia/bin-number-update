@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %}Updating - Bin Number Updater{% endblock %}
+
+{% block content %}
+<div class="card result-card">
+    <div class="card-header-with-logo">
+        <h1 id="titleText">Updating bin numbers…</h1>
+        <img src="{{ url_for('static', filename='img/zinnia-logo.png') }}" alt="Zinnia" class="card-logo" onerror="this.style.display='none'">
+    </div>
+
+    <div class="progress-bar-outer">
+        <div class="progress-bar-inner" id="progressBar" style="width: 0%"></div>
+    </div>
+    <p class="subtitle" id="progressText">0 / {{ total }} rows processed</p>
+
+    <div id="completedBox" style="display:none;">
+        <div class="stats">
+            <div class="stat stat-total">
+                <span class="stat-value">{{ total }}</span>
+                <span class="stat-label">Total Rows</span>
+            </div>
+            <div class="stat stat-success">
+                <span class="stat-value" id="successCount">0</span>
+                <span class="stat-label">Updated</span>
+            </div>
+            <div class="stat stat-failed">
+                <span class="stat-value" id="failedCount">0</span>
+                <span class="stat-label">Failed</span>
+            </div>
+        </div>
+
+        <div id="sampleBox" style="display:none;">
+            <h3>Sample of updated contracts</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead><tr><th>Contract Number</th><th>Bin Number</th></tr></thead>
+                    <tbody id="sampleBody"></tbody>
+                </table>
+            </div>
+            <a id="downloadLink" href="#" class="btn btn-secondary">Download updated contracts (Excel)</a>
+        </div>
+
+        <div class="form-actions">
+            <a href="{{ url_for('index') }}" class="btn btn-primary">Home</a>
+        </div>
+    </div>
+</div>
+
+<style>
+.progress-bar-outer {
+    background: #f1f5f9;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    height: 18px;
+    overflow: hidden;
+    margin: 1rem 0 0.5rem;
+}
+
+.progress-bar-inner {
+    height: 100%;
+    background: var(--primary);
+    transition: width 0.3s ease;
+}
+</style>
+
+<script>
+const jobId = "{{ job_id }}";
+const total = {{ total }};
+
+function poll() {
+    fetch(`/update-progress/${jobId}`)
+        .then(r => r.json())
+        .then(data => {
+            const pct = total ? Math.round((data.processed / total) * 100) : 100;
+            document.getElementById('progressBar').style.width = pct + '%';
+
+            if (data.status === 'done' || data.status === 'error') {
+                document.getElementById('progressText').style.display = 'none';
+                document.getElementById('progressBar').style.width = '100%';
+                document.getElementById('completedBox').style.display = 'block';
+                document.getElementById('successCount').textContent = data.success || 0;
+                document.getElementById('failedCount').textContent = data.failed || 0;
+                document.getElementById('titleText').textContent =
+                    data.status === 'done' ? 'Update completed' : 'Update failed';
+
+                if (data.sample && data.sample.length) {
+                    const body = document.getElementById('sampleBody');
+                    body.innerHTML = '';
+                    data.sample.forEach(row => {
+                        const tr = document.createElement('tr');
+                        const tdContract = document.createElement('td');
+                        tdContract.textContent = row.contract_num;
+                        const tdBin = document.createElement('td');
+                        tdBin.textContent = row.bin_num;
+                        tr.append(tdContract, tdBin);
+                        body.appendChild(tr);
+                    });
+                    document.getElementById('downloadLink').href = `/download-updated/${jobId}`;
+                    document.getElementById('sampleBox').style.display = 'block';
+                }
+                return;
+            }
+
+            document.getElementById('progressText').textContent = `${data.processed} / ${total} rows processed`;
+            setTimeout(poll, 700);
+        })
+        .catch(() => setTimeout(poll, 1500));
+}
+
+poll();
+</script>
+{% endblock %}

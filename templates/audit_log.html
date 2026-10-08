@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Audit log - Bin Number Updater{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header-with-logo">
+        <h1>Audit Log</h1>
+        <img src="{{ url_for('static', filename='img/zinnia-logo.png') }}" alt="Zinnia" class="card-logo" onerror="this.style.display='none'">
+    </div>
+    <p class="subtitle">One row per contract: who made the change, when, and status (updated / failed / skipped).</p>
+
+    <form method="get" action="{{ url_for('audit_log') }}" class="audit-search-form">
+        <input type="text" name="contract" placeholder="Search by contract number" value="{{ search or '' }}">
+        <button type="submit" class="btn btn-primary">Search</button>
+        {% if search %}
+        <a href="{{ url_for('audit_log') }}" class="btn btn-secondary">Clear</a>
+        {% endif %}
+    </form>
+
+    {% if search %}
+    <p class="form-hint">Showing results for "{{ search }}".</p>
+    {% endif %}
+
+    {% if entries %}
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>When</th>
+                    <th>Who</th>
+                    <th>Contract #</th>
+                    <th>Status</th>
+                    <th>Error</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for e in entries %}
+                <tr>
+                    <td>{{ e.AUDIT_WHEN }}</td>
+                    <td>{{ e.AUDIT_WHO }}</td>
+                    <td>{{ e.IDENTIFIER }}</td>
+                    <td>{{ e.STATUS }}</td>
+                    <td class="error-text">{{ e.ERROR_MSG or '' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="pagination">
+        {% if page > 1 %}
+        <a href="{{ url_for('audit_log', contract=search, page=page - 1) }}" class="btn btn-secondary">Previous</a>
+        {% else %}
+        <span class="btn btn-secondary disabled">Previous</span>
+        {% endif %}
+
+        <span class="pagination-status">Page {{ page }} of {{ total_pages }} ({{ total }} total)</span>
+
+        {% if page < total_pages %}
+        <a href="{{ url_for('audit_log', contract=search, page=page + 1) }}" class="btn btn-secondary">Next</a>
+        {% else %}
+        <span class="btn btn-secondary disabled">Next</span>
+        {% endif %}
+    </div>
+    {% else %}
+    <p class="form-hint">{{ "No matching audit entries." if search else "No audit entries yet. Entries are added after each successful update." }}</p>
+    {% endif %}
+</div>
+
+<style>
+.audit-search-form {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.audit-search-form input[type="text"] {
+    max-width: 320px;
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.25rem;
+}
+
+.pagination-status {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+.btn.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+</style>
+{% endblock %}

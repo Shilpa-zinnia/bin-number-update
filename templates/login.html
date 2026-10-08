@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Bin Number Updater{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="card-header">
+            <h1>Login to Bin Number Updater</h1>
+            <p class="subtitle">Enter your LAN ID to continue</p>
+        </div>
+
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('login') }}">
+                <div class="form-group">
+                    <label for="lan_id" class="form-label">LAN ID</label>
+                    <input
+                        type="text"
+                        name="lan_id"
+                        id="lan_id"
+                        class="form-control"
+                        required
+                        autofocus
+                        placeholder="Enter your LAN ID"
+                        value="{{ lan_id }}"
+                        autocomplete="username"
+                    />
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary btn-block">
+                        Login
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 200px);
+    padding: 2rem 1rem;
+}
+
+.auth-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+    max-width: 480px;
+    width: 100%;
+}
+
+.auth-card .card-header {
+    padding: 2rem 2rem 1rem;
+    text-align: center;
+}
+
+.auth-card .card-header h1 {
+    font-size: 1.75rem;
+    margin-bottom: 0.5rem;
+    color: #1e293b;
+}
+
+.auth-card .subtitle {
+    color: #64748b;
+    font-size: 0.95rem;
+}
+
+.auth-card .card-body {
+    padding: 1rem 2rem 2rem;
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-label {
+    display: block;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 0.5rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    transition: all 0.2s;
+    box-sizing: border-box;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+}
+
+.btn-block {
+    width: 100%;
+    padding: 0.875rem;
+    font-size: 1.05rem;
+}
+
+.nav-user {
+    font-size: 0.9rem;
+    color: #64748b;
+    padding: 0 0.5rem;
+}
+</style>
+{% endblock %}

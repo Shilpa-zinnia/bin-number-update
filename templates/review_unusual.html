@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Review unusual values - Bin Number Updater{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header-with-logo">
+        <h1>Unusual values found</h1>
+        <img src="{{ url_for('static', filename='img/zinnia-logo.png') }}" alt="Zinnia" class="card-logo" onerror="this.style.display='none'">
+    </div>
+    <p class="subtitle">
+        {{ total_flagged }} row(s) have a Contract Number or Bin Number that isn't in the expected format
+        (Bin Number should be all digits; Contract Number shouldn't contain special characters).
+    </p>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Row</th>
+                    <th>Contract Number</th>
+                    <th>Bin Number</th>
+                    <th>Issue</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for f in flagged %}
+                <tr>
+                    <td>{{ f.index + 1 }}</td>
+                    <td>{{ f.contract_num }}</td>
+                    <td>{{ f.bin_num }}</td>
+                    <td class="error-text">{{ f.reason }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <p class="form-hint">Do you want to proceed with these values exactly as uploaded?</p>
+
+    <form action="{{ url_for('review_unusual') }}" method="post">
+        <input type="hidden" name="preview_id" value="{{ preview_id }}">
+        <div class="form-actions">
+            <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancel and upload again</a>
+            <button type="submit" name="decision" value="no" class="btn btn-secondary">No, let me fix them</button>
+            <button type="submit" name="decision" value="yes" class="btn btn-primary">Yes, proceed as uploaded</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
